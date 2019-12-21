@@ -1,6 +1,5 @@
 // pub mod neuron;
 pub mod neat;
-pub mod edge;
 pub mod neatenv;
 pub mod neuron;
 pub mod layers;

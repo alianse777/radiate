@@ -3,7 +3,6 @@
 use std::collections::HashMap;
 use super::counter::Counter;
 use super::activation::Activation;
-use super::edge::Edge;
 use super::neuron::Neuron;
 
 use crate::engine::environment::Envionment;
@@ -43,7 +42,6 @@ pub struct NeatEnvironment {
 
     // global variables for evolution
     pub innov_counter: Counter,
-    pub global_edges: HashMap<(i32, i32), Edge>,
     pub global_nodes: HashMap<(i32, i32), Neuron>
 }
 
@@ -65,7 +63,6 @@ impl NeatEnvironment {
             output_size: None,
             activation_functions: vec![Activation::Sigmoid],
             innov_counter: Counter::new(),
-            global_edges: HashMap::new(),
             global_nodes: HashMap::new()
         }
     }
@@ -159,11 +156,6 @@ impl NeatEnvironment {
         &mut self.global_nodes
     }
 
-
-    pub fn get_mut_edges(&mut self) -> &mut HashMap<(i32, i32), Edge> {
-        &mut self.global_edges
-    }
-
     
     pub fn subtract_count(&mut self, num: i32) {
         self.innov_counter.roll_back(num);
@@ -187,7 +179,6 @@ impl Default for NeatEnvironment {
 impl Envionment for NeatEnvironment {
 
     fn reset(&mut self) {
-        self.global_edges = HashMap::new();
         self.global_nodes = HashMap::new();
     }
 

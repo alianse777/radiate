@@ -12,14 +12,16 @@ use super::neurontype::NeuronType;
 
 
 
+
 /// Neuron is a wrapper around a neuron providing only what is needed for a neuron to be added 
 /// to the NEAT graph, while the neuron encapsulates the neural network logic for the specific nodetype,
 /// Some neurons like an LSTM require more variables and different interal activation logic, 
 /// so encapsulating that within a normal node on the graph would be misplaced.
 pub struct Neuron {
     pub innov: Uuid,
-    pub outgoing: Vec<Uuid>,
-    pub incoming: HashMap<Uuid, Option<f64>>,
+    pub outgoing: HashMap<*mut Neuron, f64>,
+    pub inactive: HashMap<*mut Neuron, f64>,
+    pub incoming: HashMap<*mut Neuron, Option<f64>>,
     pub value: Option<f64>,
     pub error: Option<f64>,
     pub bias: f64,
@@ -29,13 +31,15 @@ pub struct Neuron {
 
 
 
+
 impl Neuron {
 
 
     pub fn new(innov: Uuid, neuron_type: NeuronType, activation: Activation) -> Self {
         Neuron {
             innov,
-            outgoing: Vec::new(),
+            outgoing: HashMap::new(),
+            inactive: HashMap::new(),
             incoming: HashMap::new(),
             value: None,
             error: None,
@@ -117,7 +121,15 @@ impl Clone for Neuron {
             innov: self.innov,
             outgoing: self.outgoing
                 .iter()
-                .map(|x| *x)
+                .map(|x| {
+                    unsafe { ((**x.0).clone().as_mut_ptr(), *x.1) }
+                })
+                .collect(),
+            inactive: self.inactive
+                .iter()
+                .map(|x| {
+                    unsafe { ((**x.0).clone().as_mut_ptr(), *x.1) }
+                })
                 .collect(),
             incoming: self.incoming
                 .iter()
@@ -145,13 +157,13 @@ impl fmt::Debug for Neuron {
 
         let mut income = self.incoming
             .iter()
-            .map(|x| format!("\n\t\t{} val -> {:?},", x.0, x.1))
+            .map(|x| format!("\n\t\tNeuron val -> {:?},", x.1))
             .collect::<Vec<_>>()
             .join("");
         let mut outcome = self.outgoing
             .iter()
             .map(|x| {
-                format!("\n\t\t{},", x)
+                format!("\n\t\t{},", x.1)
             })
             .collect::<Vec<_>>()
             .join("");   

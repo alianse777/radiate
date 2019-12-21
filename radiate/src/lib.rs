@@ -19,7 +19,6 @@ pub use models::{
             dense::Dense,
         },
         neurontype::NeuronType,
-        edge::Edge,
         neuron::Neuron,
         counter::Counter,
         neat::Neat,
