@@ -111,6 +111,17 @@ impl Neuron {
     }
 
 
+    pub fn random_connection(&self) -> &*mut Neuron {
+        let index = rand::thread_rng().gen_range(0, self.outgoing.len()) as usize;
+        for (i, neuron_ptr) in self.outgoing.keys().enumerate() {
+            if i == index {
+                return neuron_ptr;
+            }
+        }
+        panic!("Random connection failed.");
+    }
+
+
 }
 
 
